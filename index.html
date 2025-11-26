@@ -1,30 +1,24 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
   <meta charset="UTF-8" />
-  <title>ClickUp Proofing Portal – Stable</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ClickUp Proofing Portal</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <header>
-    <h1>ClickUp Proofing Portal</h1>
-    <p class="subtitle">Stable build – testing ClickUp list fetch</p>
-  </header>
 
-  <main>
-    <section class="card">
-      <h2>Signage Tasks</h2>
-      <p class="hint">
-        URL format: <code>?list=YOUR_LIST_ID</code>
-      </p>
-      <div id="status">Loading…</div>
-      <pre id="error" class="error hidden"></pre>
-      <ul id="tasks"></ul>
-      <pre id="raw" class="raw"></pre>
-    </section>
-  </main>
+<div class="layout">
+    <aside class="sidebar">
+        <h2>Signage Tasks</h2>
+        <div id="taskList">Loading…</div>
+    </aside>
 
-  <script src="script.js"></script>
+    <main class="viewer">
+        <h2 id="taskTitle">Select a task</h2>
+        <div id="attachmentContainer">No attachment loaded.</div>
+    </main>
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>
