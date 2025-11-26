@@ -1,51 +1,76 @@
-document.addEventListener('DOMContentLoaded', async () => {
-  const statusEl = document.getElementById('status');
-  const errorEl = document.getElementById('error');
-  const tasksEl = document.getElementById('tasks');
-  const rawEl = document.getElementById('raw');
+const taskListEl = document.getElementById("taskList");
+const taskTitleEl = document.getElementById("taskTitle");
+const attachmentEl = document.getElementById("attachmentContainer");
 
-  const params = new URLSearchParams(window.location.search);
-  const listId = params.get('list');
+// Get listId from URL
+const urlParams = new URLSearchParams(window.location.search);
+const listId = urlParams.get("list");
 
-  if (!listId) {
-    statusEl.textContent = 'Missing list ID. Add ?list=YOUR_LIST_ID to the URL.';
+if (!listId) {
+  taskListEl.innerHTML = "<p>Missing ?list=LIST_ID in URL.</p>";
+} else {
+  loadTasks(listId);
+}
+
+async function loadTasks(listId) {
+  try {
+    const res = await fetch(`/api/get-signage-tasks?listId=${listId}`);
+    const data = await res.json();
+
+    if (!data.tasks || data.tasks.length === 0) {
+      taskListEl.innerHTML = "<p>No signage tasks.</p>";
+      return;
+    }
+
+    renderTaskList(data.tasks);
+  } catch (err) {
+    taskListEl.innerHTML = "<p>Error loading tasks.</p>";
+  }
+}
+
+function renderTaskList(tasks) {
+  taskListEl.innerHTML = "";
+
+  tasks.forEach(task => {
+    const div = document.createElement("div");
+    div.className = "task";
+    div.innerHTML = `${task.name} <br><small>${task.id}</small>`;
+
+    div.onclick = () => {
+      taskTitleEl.textContent = task.name;
+      loadAttachment(task);
+    };
+
+    taskListEl.appendChild(div);
+  });
+}
+
+function loadAttachment(task) {
+  attachmentEl.innerHTML = "";
+
+  const attField = task.custom_fields?.find(f => f.name === "Attachments");
+
+  if (!attField || !attField.value || attField.value.length === 0) {
+    attachmentEl.innerHTML = "<p>No attachment/preview available.</p>";
     return;
   }
 
-  statusEl.textContent = 'Calling /api/get-signage-tasks…';
+  const file = attField.value[0];
+  const url = file.url_w_query || file.url;
 
-  try {
-    const url = `/api/get-signage-tasks?list=${encodeURIComponent(listId)}`;
-    console.log('Fetching:', url);
-    const res = await fetch(url);
-    const data = await res.json();
-
-    rawEl.textContent = JSON.stringify(data, null, 2);
-
-    if (!res.ok || data.error) {
-      statusEl.textContent = 'Error from API.';
-      errorEl.classList.remove('hidden');
-      errorEl.textContent = data.error || `HTTP ${res.status}`;
-      return;
-    }
-
-    const tasks = data.tasks || [];
-    if (tasks.length === 0) {
-      statusEl.textContent = 'No tasks returned from ClickUp.';
-      return;
-    }
-
-    statusEl.textContent = `Loaded ${tasks.length} task(s).`;
-    tasksEl.innerHTML = '';
-    tasks.forEach(t => {
-      const li = document.createElement('li');
-      li.innerHTML = `${t.name || '(no name)'} <span class="id">(${t.id})</span>`;
-      tasksEl.appendChild(li);
-    });
-  } catch (err) {
-    console.error(err);
-    statusEl.textContent = 'Request failed.';
-    errorEl.classList.remove('hidden');
-    errorEl.textContent = String(err);
+  if (!url) {
+    attachmentEl.innerHTML = "<p>Attachment URL missing.</p>";
+    return;
   }
-});
+
+  // Render PDF or image
+  if (file.extension === "pdf") {
+    attachmentEl.innerHTML = `
+      <iframe src="${url}" width="100%" height="800px"></iframe>
+    `;
+  } else {
+    attachmentEl.innerHTML = `
+      <img src="${url}" alt="${file.title}">
+    `;
+  }
+}
