@@ -14,7 +14,7 @@ if (!listId) {
 
 async function loadTasks(listId) {
   try {
-    const res = await fetch(`/api/get-signage-tasks?listId=${listId}`);
+    const res = await fetch(`/api/get-signage-tasks?list=${listId}`);
     const data = await res.json();
 
     if (!data.tasks || data.tasks.length === 0) {
