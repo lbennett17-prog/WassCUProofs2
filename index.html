@@ -3,22 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <title>ClickUp Proofing Portal</title>
-  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+  <h1>ClickUp Proofing Portal</h1>
+  <p>Testing basic pull…</p>
 
-<div class="layout">
-    <aside class="sidebar">
-        <h2>Signage Tasks</h2>
-        <div id="taskList">Loading…</div>
-    </aside>
+  <div>
+    <label>List ID: </label>
+    <input id="listInput" placeholder="Enter ClickUp List ID" />
+    <button onclick="loadTasks()">Load</button>
+  </div>
 
-    <main class="viewer">
-        <h2 id="taskTitle">Select a task</h2>
-        <div id="attachmentContainer">No attachment loaded.</div>
-    </main>
-</div>
+  <pre id="output" style="margin-top:20px; background:#f1f1f1; padding:15px;"></pre>
 
-<script src="script.js"></script>
+  <script src="./script.js"></script>
 </body>
 </html>
